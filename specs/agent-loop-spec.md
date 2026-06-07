@@ -122,7 +122,9 @@ for tool_call in assistant_message.tool_calls:
 *The loop should stop when: (a) the LLM returns a response with no tool calls, OR (b) the MAX_TOOL_ROUNDS limit is reached. Describe how you will detect each condition and what you will return in each case.*
 
 ```
-[your answer here]
+Loop up to MAX_TOOL_ROUNDS times. Stop the loop when the assistant message has no tool calls (when assistant.message.tool_calls is falsy) and return the assistant message as the agent's response.
+
+If the loop exits because MAX_TOOL_ROUNDS was reached, return a fallback message: "Sorry, I couldn't produce an answer. Please try again or provide more detail."
 ```
 
 ---
@@ -132,7 +134,7 @@ for tool_call in assistant_message.tool_calls:
 *Once the loop exits because there are no more tool calls, how do you extract the text content from the response object? What field holds the string you should return?*
 
 ```
-[your answer here]
+Take the assistant message at response.choices[0].message. The user-facing text to return will be assistant.message.content. If content is a string, return as it is. If it is structured, normalize by concatenating the text. If the content is empty, return the fallback message.
 ```
 
 ---
@@ -145,19 +147,29 @@ for tool_call in assistant_message.tool_calls:
 
 ```
 Query: "How should I care for my calathea?"
-Round 1 tool call: [tool name, args]
-Round 2 tool call: [tool name, args] (if any)
-Final response: [brief description]
+Round 1 tool call: Tool call: lookup_plant({'plant_name': 'pothos'})
+Round 2 tool call: Tool call: get_seasonal_conditions({})
+Final response: 
+
+According to the care data for your pothos, it prefers to have the top inch of soil to dry out between waterings. It's also an easy plant to care for and can thrive in low to bright indirect light. The ideal temperature for your pothos is between 65-85°F (18-29°C), and it's tolerant of average household humidity (40-60%).
+
+As we are currently in summer, it's essential to water your pothos more frequently, as the hot weather and air conditioning can dry out the soil faster. You should also continue to fertilize your pothos regularly, as it's the peak growing season. However, be cautious not to over-fertilize, as this can harm your plant.
+
+Additionally, be on the lookout for pests like spider mites and fungus gnats, which can thrive in the hot and dry conditions of summer. Check your plant weekly for any signs of infection, and isolate it immediately if you notice any issues.
+
+By following these care tips, you should be able to keep your pothos happy and healthy throughout the summer season.
 ```
 
 **What happens when you ask about a plant that isn't in the database?**
 
 ```
-[describe the behavior you observed]
+It returns the fallback message and also provides some general guidance.
 ```
 
 **One thing about the tool call API that surprised you:**
 
 ```
-[your answer here]
+
+I was surprised that the tool response has to come immediately after the assistant message that requested it, with a matching tool_call_id.
+I 
 ```
